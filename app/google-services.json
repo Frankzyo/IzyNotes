@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "86968434395",
+    "project_id": "izynotes",
+    "storage_bucket": "izynotes.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:86968434395:android:51355eecda368b4d9b16fe",
+        "android_client_info": {
+          "package_name": "com.programovil.izynotes"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAOuP-WiuP9mPnsNl9xMDVY3e39WemAkdk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
