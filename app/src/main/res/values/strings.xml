@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">IzyNotes</string>
+    <string name="guardar_cambios">Guardar cambios</string>
+    <string name="titulo_perfil">Perfil</string>
+    <string name="hint_nombre">Nombre</string>
+    <string name="hint_correo">Correo</string>
+    <string name="navigation_drawer_open">Abrir menú</string>
+    <string name="navigation_drawer_close">Cerrar menú</string>
 </resources>
