@@ -64,6 +64,21 @@ class Inicio : AppCompatActivity() {
                 R.id.nav_archivo -> Toast.makeText(this, "Archivo seleccionado", Toast.LENGTH_SHORT).show()
                 R.id.nav_papelera -> Toast.makeText(this, "Papelera seleccionada", Toast.LENGTH_SHORT).show()
                 R.id.nav_ajustes -> Toast.makeText(this, "Ajustes seleccionados", Toast.LENGTH_SHORT).show()
+                R.id.nav_cerrarSesion -> {
+                    //Borado de datos
+                    val prefs = getSharedPreferences(getString(R.string.prefs_file), Context.MODE_PRIVATE).edit()
+                    prefs.clear()
+                    prefs.apply()
+
+                    // Cerrar sesión del usuario
+                    FirebaseAuth.getInstance().signOut()
+
+                    // Redirigir a la pantalla de login
+                    val intent = Intent(this, login::class.java)
+                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK // Limpia la pila de actividades
+                    startActivity(intent)
+                    finish()
+                }
             }
             drawerLayout.closeDrawer(GravityCompat.START)
             true
