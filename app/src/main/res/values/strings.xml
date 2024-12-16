@@ -1,9 +1,41 @@
 <resources>
+    <!-- Strings existentes -->
     <string name="app_name">IzyNotes</string>
     <string name="guardar_cambios">Guardar cambios</string>
     <string name="titulo_perfil">Perfil</string>
     <string name="hint_nombre">Nombre</string>
     <string name="hint_correo">Correo</string>
+
+    <string name="boton_agregar_nota">Agregar Nota</string>
+
+    <!-- Strings nuevos para notas -->
+    <string name="boton_agregar_imagen">Agregar Imagen</string>
+    <string name="boton_agregar_audio">Grabar Audio</string>
+    <string name="boton_agregar_texto">Agregar Texto</string>
+    <string name="boton_guardar">Guardar Nota</string>
+    <string name="boton_cambiar_color">Cambiar Color</string>
+    <string name="boton_cambiar_tamano">Cambiar Tamaño</string>
+    <string name="hint_titulo_nota">Título de la nota</string>
     <string name="navigation_drawer_open">Abrir menú</string>
     <string name="navigation_drawer_close">Cerrar menú</string>
+
+    <!-- Strings del menú lateral -->
+    <string name="menu_notas">Notas</string>
+    <string name="menu_ajustes">Ajustes</string>
+    <string name="menu_perfil">Perfil</string>
+    <string name="menu_archivo">Archivo</string>
+    <string name="menu_papelera">Papelera</string>
+
+    <!-- Strings adicionales para audio e imágenes -->
+    <string name="stop_recording">Detener Grabación</string>
+    <string name="recording_audio">Grabando audio...</string>
+    <string name="recording_finished">Grabación finalizada</string>
+    <string name="upload_success">Archivo subido correctamente</string>
+    <string name="upload_failed">Error al subir el archivo</string>
+    <string name="play_audio">Reproducir audio</string>
+    <string name="playback_finished">Reproducción finalizada</string>
+    <string name="playing_audio">Reproduciendo audio...</string>
+
+    <string name="titulo_nota">Título de la nota</string>
+    <string name="descripcion_nota">Descripción de la nota</string>
 </resources>
