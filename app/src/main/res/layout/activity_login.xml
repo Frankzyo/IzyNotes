@@ -9,6 +9,14 @@
     android:background="@color/black"
     >
 
+    <LinearLayout
+        android:id="@+id/authLayout"
+        android:layout_width="392dp"
+        android:layout_height="465dp"
+        android:orientation="vertical"
+        tools:layout_editor_absoluteX="0dp"
+        tools:layout_editor_absoluteY="392dp"></LinearLayout>
+
     <EditText
         android:id="@+id/editTextText"
         android:layout_width="match_parent"
