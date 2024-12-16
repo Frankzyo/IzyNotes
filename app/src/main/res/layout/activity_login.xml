@@ -11,12 +11,20 @@
 
     <LinearLayout
         android:id="@+id/authLayout"
+<<<<<<< HEAD
         android:layout_width="413dp"
         android:layout_height="491dp"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"></LinearLayout>
+=======
+        android:layout_width="392dp"
+        android:layout_height="465dp"
+        android:orientation="vertical"
+        tools:layout_editor_absoluteX="0dp"
+        tools:layout_editor_absoluteY="392dp"></LinearLayout>
+>>>>>>> 89290af69c6dc1eb5f745639a8e34ada7417bfe1
 
     <EditText
         android:id="@+id/editTextText"
