@@ -10,7 +10,8 @@ import com.bumptech.glide.Glide
 
 class NotasAdapter(
     private val listaNotas: MutableList<Nota>,
-    private val onEliminarClick: (String) -> Unit // Callback para eliminar una nota
+    private val onEliminarClick: (String) -> Unit, // Callback para eliminar una nota
+    private val onEditarClick: (Nota) -> Unit // Callback para editar una nota
 ) : RecyclerView.Adapter<NotasAdapter.ViewHolder>() {
 
     // ViewHolder que define las vistas para cada elemento de la lista
@@ -19,6 +20,7 @@ class NotasAdapter(
         val descripcion: TextView = itemView.findViewById(R.id.textDescripcion)
         val imagen: ImageView = itemView.findViewById(R.id.ivImagenNota)
         val botonEliminar: ImageView = itemView.findViewById(R.id.btnEliminarNota) // Botón de eliminar
+        val botonEditar: ImageView = itemView.findViewById(R.id.btnEditarNota) // Botón de editar
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -55,8 +57,13 @@ class NotasAdapter(
         holder.botonEliminar.setOnClickListener {
             onEliminarClick(nota.id) // Notificar a la actividad
         }
-    }
 
+        // Configurar botón editar
+        holder.botonEditar.setOnClickListener {
+            onEditarClick(nota) // Envía el objeto Nota al callback
+        }
+    }
 
     override fun getItemCount(): Int = listaNotas.size
 }
+

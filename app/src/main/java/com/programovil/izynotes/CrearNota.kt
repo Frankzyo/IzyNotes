@@ -23,6 +23,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
+import com.bumptech.glide.Glide
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
@@ -58,16 +59,171 @@ class CrearNota : AppCompatActivity() {
         contenedorNota = findViewById(R.id.contenedorNota)
         setupMenu()
 
+        val notaId = intent.getStringExtra("notaId")
+        val tituloNota = intent.getStringExtra("titulo")
+
+        // Si recibimos una notaId, cargamos la nota existente
+        if (notaId != null) {
+            cargarNotaExistente(notaId, tituloNota)
+        }
+
         findViewById<ImageButton>(R.id.btnAgregarImagen).setOnClickListener { abrirOpcionesImagen() }
         findViewById<ImageButton>(R.id.btnAgregarAudio).setOnClickListener { grabarAudio() }
         findViewById<ImageButton>(R.id.btnAgregarTexto).setOnClickListener { agregarTexto() }
         findViewById<ImageButton>(R.id.btnGuardarNota).setOnClickListener {
             val titulo = findViewById<EditText>(R.id.editTextTituloNota).text.toString().trim()
             if (titulo.isNotEmpty()) {
-                guardarNotaEnFirebase(titulo)
+                if (notaId != null) {
+                    actualizarNotaEnFirebase(notaId, titulo)
+                } else {
+                    guardarNotaEnFirebase(titulo)
+                }
             } else {
                 Toast.makeText(this, "El título no puede estar vacío", Toast.LENGTH_SHORT).show()
             }
+        }
+    }
+    private fun cargarNotaExistente(notaId: String, tituloNota: String?) {
+        val tituloEditText = findViewById<EditText>(R.id.editTextTituloNota)
+        tituloEditText.setText(tituloNota)
+
+        val notaRef = FirebaseDatabase.getInstance().getReference("notas").child(notaId)
+
+        notaRef.get().addOnSuccessListener { snapshot ->
+            val elementos = snapshot.child("elementos").value as? List<Map<String, Any>>
+            if (elementos == null) {
+                Log.e("Firebase", "No hay elementos en la nota")
+                return@addOnSuccessListener
+            }
+
+            elementos.forEach { elemento ->
+                val tipo = elemento["tipo"] as? String ?: return@forEach
+                val posicion = elemento["posicion"] as? Map<*, *>
+                val x = (posicion?.get("x") as? Double)?.toFloat() ?: 0f
+                val y = (posicion?.get("y") as? Double)?.toFloat() ?: 0f
+
+                when (tipo) {
+                    "texto" -> {
+                        val texto = elemento["contenido"] as? String ?: ""
+                        val editText = EditText(this).apply {
+                            setText(texto)
+                            setTextColor(Color.BLACK)
+                            setHintTextColor(Color.BLACK)
+                            setBackgroundColor(Color.TRANSPARENT)
+                            layoutParams = FrameLayout.LayoutParams(
+                                FrameLayout.LayoutParams.WRAP_CONTENT,
+                                FrameLayout.LayoutParams.WRAP_CONTENT
+                            )
+                            setOnTouchListener(MovableTouchListener(this))
+                        }
+                        contenedorNota.addView(editText)
+
+                        // Ajustar la posición después de añadir la vista
+                        editText.post {
+                            editText.x = x
+                            editText.y = y
+                        }
+                    }
+                    "imagen" -> {
+                        val url = elemento["url"] as? String ?: return@forEach
+                        val imageView = ImageView(this).apply {
+                            Glide.with(this@CrearNota).load(url).into(this)
+                            layoutParams = FrameLayout.LayoutParams(300, 300)
+                            setOnTouchListener(MovableTouchListener(this))
+                        }
+                        contenedorNota.addView(imageView)
+
+                        // Ajustar la posición
+                        imageView.post {
+                            imageView.x = x
+                            imageView.y = y
+                        }
+                    }
+                    "audio" -> {
+                        val url = elemento["url"] as? String ?: return@forEach
+                        val button = Button(this).apply {
+                            text = "▶ Reproducir Audio"
+                            layoutParams = FrameLayout.LayoutParams(300, 100)
+                            setOnTouchListener(MovableTouchListener(this))
+                            setOnClickListener {
+                                mediaPlayer?.release()
+                                mediaPlayer = MediaPlayer().apply {
+                                    setDataSource(url)
+                                    prepare()
+                                    start()
+                                }
+                            }
+                        }
+                        contenedorNota.addView(button)
+
+                        // Ajustar la posición
+                        button.post {
+                            button.x = x
+                            button.y = y
+                        }
+                    }
+                }
+            }
+        }.addOnFailureListener {
+            Toast.makeText(this, "Error al cargar la nota", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun actualizarNotaEnFirebase(notaId: String, titulo: String) {
+        val elementos = mutableListOf<Map<String, Any>>()
+        var totalSubidasPendientes = 0
+        var subidasCompletadas = 0
+
+        fun verificarSubidasCompletas() {
+            if (subidasCompletadas == totalSubidasPendientes) {
+                val actualizacion = mapOf(
+                    "titulo" to titulo,
+                    "elementos" to elementos
+                )
+                databaseReference.child("notas").child(notaId).updateChildren(actualizacion)
+                    .addOnSuccessListener {
+                        Toast.makeText(this, "Nota actualizada correctamente", Toast.LENGTH_SHORT).show()
+                        finish()
+                    }
+                    .addOnFailureListener {
+                        Toast.makeText(this, "Error al actualizar la nota", Toast.LENGTH_SHORT).show()
+                    }
+            }
+        }
+
+        for (i in 0 until contenedorNota.childCount) {
+            val view = contenedorNota.getChildAt(i)
+            when (view) {
+                is EditText -> {
+                    val elemento = mapOf(
+                        "tipo" to "texto",
+                        "contenido" to view.text.toString(),
+                        "posicion" to mapOf("x" to view.x, "y" to view.y)
+                    )
+                    elementos.add(elemento)
+                }
+                is ImageView, is Button -> {
+                    val uri = view.tag as? Uri
+                    if (uri != null) {
+                        totalSubidasPendientes++
+                        subirArchivoAFirebase(uri) { url ->
+                            val tipo = if (view is ImageView) "imagen" else "audio"
+                            val elemento = mapOf(
+                                "tipo" to tipo,
+                                "url" to url,
+                                "posicion" to mapOf("x" to view.x, "y" to view.y)
+                            )
+                            elementos.add(elemento)
+                            subidasCompletadas++
+                            verificarSubidasCompletas()
+                        }
+                    }
+                }
+            }
+        }
+
+        if (totalSubidasPendientes == 0) {
+            verificarSubidasCompletas()
         }
     }
 
@@ -169,12 +325,13 @@ class CrearNota : AppCompatActivity() {
                 FrameLayout.LayoutParams.WRAP_CONTENT
             )
             hint = "Escribe aquí"
-            setTextColor(Color.BLACK)
+            setHintTextColor(Color.BLACK) // Color negro para el hint
+            setTextColor(Color.BLACK)     // Color negro para el texto
+            setBackgroundColor(Color.TRANSPARENT) // Fondo transparente
             setOnTouchListener(MovableTouchListener(this))
         }
         contenedorNota.addView(editText)
     }
-
 
     private fun guardarNotaEnFirebase(titulo: String) {
         val usuario = FirebaseAuth.getInstance().currentUser

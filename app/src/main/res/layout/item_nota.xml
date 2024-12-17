@@ -43,16 +43,36 @@
             android:scaleType="centerCrop"
             android:visibility="gone" />
 
-        <!-- Botón Eliminar -->
-        <ImageView
-            android:id="@+id/btnEliminarNota"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_marginTop="8dp"
-            android:src="@drawable/ic_delete"
-            android:contentDescription="Eliminar Nota"
-            android:layout_gravity="end"
-            app:tint="@color/red" />
+        <!-- Botón Eliminar y Editar -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="end">
+
+            <!-- Botón Editar -->
+            <ImageView
+                android:id="@+id/btnEditarNota"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:src="@drawable/ic_edit"
+                android:contentDescription="Editar Nota"
+                app:tint="@color/blue" />
+
+            <!-- Botón Eliminar -->
+            <ImageView
+                android:id="@+id/btnEliminarNota"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginTop="8dp"
+                android:src="@drawable/ic_delete"
+                android:contentDescription="Eliminar Nota"
+                app:tint="@color/red" />
+
+        </LinearLayout>
+
 
     </LinearLayout>
 </androidx.cardview.widget.CardView>

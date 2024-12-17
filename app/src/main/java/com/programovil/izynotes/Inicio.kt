@@ -114,11 +114,23 @@ class Inicio : AppCompatActivity() {
         recyclerViewNotas = findViewById(R.id.recyclerViewNotas)
         recyclerViewNotas.layoutManager = GridLayoutManager(this, 2)
 
-        notasAdapter = NotasAdapter(listaNotas) { notaId ->
-            eliminarNotaDeFirebase(notaId)
-        }
+        notasAdapter = NotasAdapter(
+            listaNotas,
+            { notaId -> eliminarNotaDeFirebase(notaId) }, // Callback para eliminar
+            { nota -> editarNota(nota) } // Callback para editar
+        )
         recyclerViewNotas.adapter = notasAdapter
     }
+
+    private fun editarNota(nota: Nota) {
+        val intent = Intent(this, CrearNota::class.java).apply {
+            putExtra("notaId", nota.id)
+            putExtra("titulo", nota.titulo)
+            // Puedes enviar otros datos de la nota si son necesarios
+        }
+        startActivity(intent)
+    }
+
     private fun eliminarNotaDeFirebase(notaId: String) {
         databaseReference.child(notaId).removeValue()
             .addOnSuccessListener {
