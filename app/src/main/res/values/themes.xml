@@ -3,7 +3,14 @@
     <style name="Base.Theme.IzyNotes" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your light theme here. -->
         <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+        <item name="searchViewStyle">@style/Widget.AppCompat.SearchView</item>
     </style>
 
     <style name="Theme.IzyNotes" parent="Base.Theme.IzyNotes" />
+    <style name="CustomSearchView" parent="Widget.AppCompat.SearchView">
+        <item name="queryBackground">@android:color/transparent</item> <!-- Fondo transparente -->
+        <item name="searchHintIcon">@drawable/ic_search</item> <!-- Ícono de lupa -->
+        <item name="android:textColor">@android:color/black</item> <!-- Color del texto -->
+        <item name="android:textColorHint">@android:color/darker_gray</item> <!-- Color del hint -->
+    </style>
 </resources>

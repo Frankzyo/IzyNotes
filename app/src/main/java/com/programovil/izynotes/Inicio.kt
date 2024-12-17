@@ -6,9 +6,12 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
+import android.widget.TextView
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.SearchView
 import androidx.core.view.GravityCompat
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -22,8 +25,10 @@ class Inicio : AppCompatActivity() {
 
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var recyclerViewNotas: RecyclerView
+    private lateinit var searchViewNotas: SearchView
     private lateinit var notasAdapter: NotasAdapter
     private val listaNotas = mutableListOf<Nota>()
+    private val listaFiltrada = mutableListOf<Nota>() // Lista para el buscador
     private lateinit var databaseReference: DatabaseReference
     private val userId = FirebaseAuth.getInstance().currentUser?.uid
 
@@ -42,6 +47,7 @@ class Inicio : AppCompatActivity() {
         setupCerrarSesion()
         setupFloatingActionButton()
         setupRecyclerView()
+        setupSearchView() // Configurar buscador
         cargarNotasDesdeFirebase()
     }
 
@@ -65,17 +71,13 @@ class Inicio : AppCompatActivity() {
                 R.id.nav_papelera -> Toast.makeText(this, "Papelera seleccionada", Toast.LENGTH_SHORT).show()
                 R.id.nav_ajustes -> Toast.makeText(this, "Ajustes seleccionados", Toast.LENGTH_SHORT).show()
                 R.id.nav_cerrarSesion -> {
-                    //Borado de datos
                     val prefs = getSharedPreferences(getString(R.string.prefs_file), Context.MODE_PRIVATE).edit()
                     prefs.clear()
                     prefs.apply()
 
-                    // Cerrar sesión del usuario
                     FirebaseAuth.getInstance().signOut()
-
-                    // Redirigir a la pantalla de login
                     val intent = Intent(this, login::class.java)
-                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK // Limpia la pila de actividades
+                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                     startActivity(intent)
                     finish()
                 }
@@ -88,8 +90,6 @@ class Inicio : AppCompatActivity() {
     private fun setupCerrarSesion() {
         val botonCerrar: Button = findViewById(R.id.cerrarSesion)
         botonCerrar.setOnClickListener {
-
-            //Borado de datos
             val prefs = getSharedPreferences(getString(R.string.prefs_file), Context.MODE_PRIVATE).edit()
             prefs.clear()
             prefs.apply()
@@ -115,18 +115,59 @@ class Inicio : AppCompatActivity() {
         recyclerViewNotas.layoutManager = GridLayoutManager(this, 2)
 
         notasAdapter = NotasAdapter(
-            listaNotas,
-            { notaId -> eliminarNotaDeFirebase(notaId) }, // Callback para eliminar
-            { nota -> editarNota(nota) } // Callback para editar
+            listaFiltrada, // Usamos la lista filtrada para mostrar resultados
+            { notaId -> eliminarNotaDeFirebase(notaId) },
+            { nota -> editarNota(nota) }
         )
         recyclerViewNotas.adapter = notasAdapter
+    }
+
+    private fun setupSearchView() {
+        searchViewNotas = findViewById(R.id.searchViewNotas)
+
+        // Forzar que el SearchView muestre el campo de búsqueda y el ícono de lupa
+        searchViewNotas.isIconified = false
+        searchViewNotas.setIconifiedByDefault(false) // No colapsar por defecto
+
+        // Modificar el color del texto dentro del SearchView
+        val textView = searchViewNotas.findViewById(androidx.appcompat.R.id.search_src_text) as TextView
+        textView.setTextColor(android.graphics.Color.BLACK) // Color del texto
+        textView.setHintTextColor(android.graphics.Color.DKGRAY) // Color del hint
+
+        // Cambiar el ícono de la lupa si es necesario
+        val searchIcon = searchViewNotas.findViewById<ImageView>(androidx.appcompat.R.id.search_mag_icon)
+        searchIcon.setImageResource(R.drawable.ic_search) // Reemplaza por tu ícono
+
+        // Configurar el listener para el buscador
+        searchViewNotas.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                filtrarNotas(query)
+                return true
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                filtrarNotas(newText)
+                return true
+            }
+        })
+    }
+
+    private fun filtrarNotas(query: String?) {
+        listaFiltrada.clear()
+        if (query.isNullOrBlank()) {
+            listaFiltrada.addAll(listaNotas) // Mostrar todas las notas si no hay búsqueda
+        } else {
+            listaNotas.filter { nota ->
+                nota.titulo.contains(query, ignoreCase = true)
+            }.let { listaFiltrada.addAll(it) }
+        }
+        notasAdapter.notifyDataSetChanged()
     }
 
     private fun editarNota(nota: Nota) {
         val intent = Intent(this, CrearNota::class.java).apply {
             putExtra("notaId", nota.id)
             putExtra("titulo", nota.titulo)
-            // Puedes enviar otros datos de la nota si son necesarios
         }
         startActivity(intent)
     }
@@ -141,6 +182,7 @@ class Inicio : AppCompatActivity() {
                 Log.e("Firebase", "Error: ${exception.message}")
             }
     }
+
     private fun cargarNotasDesdeFirebase() {
         val usuario = FirebaseAuth.getInstance().currentUser
         if (usuario == null) {
@@ -148,10 +190,9 @@ class Inicio : AppCompatActivity() {
             return
         }
 
-        val userId = usuario.uid // ID del usuario autenticado
+        val userId = usuario.uid
         databaseReference = FirebaseDatabase.getInstance().getReference("notas")
 
-        // Filtrar por usuarioId (correcto según la estructura)
         databaseReference.orderByChild("usuarioId").equalTo(userId)
             .addValueEventListener(object : ValueEventListener {
                 @SuppressLint("NotifyDataSetChanged")
@@ -160,11 +201,11 @@ class Inicio : AppCompatActivity() {
                     for (notaSnapshot in snapshot.children) {
                         val nota = notaSnapshot.getValue(Nota::class.java)
                         nota?.let {
-                            it.id = notaSnapshot.key ?: "" // Asigna el ID de la nota desde Firebase
+                            it.id = notaSnapshot.key ?: ""
                             listaNotas.add(it)
                         }
                     }
-                    notasAdapter.notifyDataSetChanged() // Actualiza el RecyclerView
+                    filtrarNotas("") // Inicializa la lista filtrada con todas las notas
                 }
 
                 override fun onCancelled(error: DatabaseError) {
@@ -173,5 +214,4 @@ class Inicio : AppCompatActivity() {
                 }
             })
     }
-
 }
