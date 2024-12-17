@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "86968434395",
+    "firebase_url": "https://izynotes-default-rtdb.firebaseio.com",
+    "project_id": "izynotes",
+    "storage_bucket": "izynotes.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:86968434395:android:51355eecda368b4d9b16fe",
+        "android_client_info": {
+          "package_name": "com.programovil.izynotes"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "86968434395-jr2pfq4k380dhd1ebhd7mmfcapdchjdg.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.programovil.izynotes",
+            "certificate_hash": "7b541fbf7e65b5f07c127f04eda116c5ea0431eb"
+          }
+        },
+        {
+          "client_id": "86968434395-95ehg5v4gl96onaa7k2a6rkafh6p41me.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAOuP-WiuP9mPnsNl9xMDVY3e39WemAkdk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "86968434395-95ehg5v4gl96onaa7k2a6rkafh6p41me.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
