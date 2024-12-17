@@ -14,7 +14,6 @@
         android:orientation="vertical"
         android:padding="8dp">
 
-        <!-- Título -->
         <TextView
             android:id="@+id/textTitulo"
             android:layout_width="wrap_content"
@@ -24,7 +23,6 @@
             android:textColor="@color/black"
             android:layout_margin="8dp" />
 
-        <!-- Descripción -->
         <TextView
             android:id="@+id/textDescripcion"
             android:layout_width="wrap_content"
@@ -34,7 +32,6 @@
             android:textColor="@color/gray"
             android:layout_margin="8dp" />
 
-        <!-- Imagen opcional -->
         <ImageView
             android:id="@+id/ivImagenNota"
             android:layout_width="match_parent"
@@ -43,14 +40,12 @@
             android:scaleType="centerCrop"
             android:visibility="gone" />
 
-        <!-- Botón Eliminar y Editar -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="end">
 
-            <!-- Botón Editar -->
             <ImageView
                 android:id="@+id/btnEditarNota"
                 android:layout_width="24dp"
@@ -61,7 +56,6 @@
                 android:contentDescription="Editar Nota"
                 app:tint="@color/blue" />
 
-            <!-- Botón Eliminar -->
             <ImageView
                 android:id="@+id/btnEliminarNota"
                 android:layout_width="24dp"

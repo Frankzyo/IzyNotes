@@ -33,13 +33,10 @@ class Perfil : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_perfil)
 
-        // Inicializar Firebase
         auth = FirebaseAuth.getInstance()
 
-        // Configurar el menú lateral
         setupMenu()
 
-        // Referencias a los elementos del diseño
         imagePerfil = findViewById(R.id.imagePerfil)
         val editTextNombre = findViewById<EditText>(R.id.editTextNombre)
         val editTextCorreo = findViewById<EditText>(R.id.editTextCorreo)
@@ -47,15 +44,12 @@ class Perfil : AppCompatActivity() {
         val editTextContrasenaNueva = findViewById<EditText>(R.id.editTextContrasena)
         val botonGuardar = findViewById<Button>(R.id.botonGuardar)
 
-        // Cargar datos del usuario
         cargarDatos(editTextNombre, editTextCorreo)
 
-        // Seleccionar una nueva imagen
         imagePerfil.setOnClickListener {
             seleccionarImagen()
         }
 
-        // Guardar cambios al hacer clic en el botón
         botonGuardar.setOnClickListener {
             guardarCambios(
                 editTextNombre,
@@ -70,7 +64,6 @@ class Perfil : AppCompatActivity() {
         drawerLayout = findViewById(R.id.drawerLayout)
         val navigationView = findViewById<NavigationView>(R.id.navigationView)
 
-        // Configurar el botón de hamburguesa
         val toggle = ActionBarDrawerToggle(
             this, drawerLayout, findViewById(R.id.toolbar),
             R.string.navigation_drawer_open,
@@ -79,11 +72,20 @@ class Perfil : AppCompatActivity() {
         drawerLayout.addDrawerListener(toggle)
         toggle.syncState()
 
-        // Manejar clics en los elementos del menú
         navigationView.setNavigationItemSelectedListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.nav_perfil -> Toast.makeText(this, "Ya estás en Perfil", Toast.LENGTH_SHORT).show()
-                R.id.nav_notas -> Toast.makeText(this, "Notas seleccionadas", Toast.LENGTH_SHORT).show()
+                R.id.nav_notas -> {
+                    val currentActivity = this::class.java.simpleName
+                    if (currentActivity != "Inicio") {
+                        val intent = Intent(this, Inicio::class.java)
+                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        startActivity(intent)
+                        finish()
+                    } else {
+                        Toast.makeText(this, "Ya estás en Inicio", Toast.LENGTH_SHORT).show()
+                    }
+                }
                 R.id.nav_archivo -> Toast.makeText(this, "Archivo seleccionado", Toast.LENGTH_SHORT).show()
                 R.id.nav_papelera -> Toast.makeText(this, "Papelera seleccionada", Toast.LENGTH_SHORT).show()
                 R.id.nav_ajustes -> Toast.makeText(this, "Ajustes seleccionados", Toast.LENGTH_SHORT).show()
@@ -98,7 +100,6 @@ class Perfil : AppCompatActivity() {
         if (currentUser != null) {
             editTextCorreo.setText(currentUser.email)
 
-            // Recuperar información adicional del Realtime Database
             database.child("usuarios").child(currentUser.uid).get().addOnSuccessListener { snapshot ->
                 val nombre = snapshot.child("nombre").value.toString()
                 val imageUrl = snapshot.child("imagenUrl").value.toString()

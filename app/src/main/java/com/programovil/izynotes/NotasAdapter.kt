@@ -10,17 +10,16 @@ import com.bumptech.glide.Glide
 
 class NotasAdapter(
     private val listaNotas: MutableList<Nota>,
-    private val onEliminarClick: (String) -> Unit, // Callback para eliminar una nota
-    private val onEditarClick: (Nota) -> Unit // Callback para editar una nota
+    private val onEliminarClick: (String) -> Unit,
+    private val onEditarClick: (Nota) -> Unit
 ) : RecyclerView.Adapter<NotasAdapter.ViewHolder>() {
 
-    // ViewHolder que define las vistas para cada elemento de la lista
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val titulo: TextView = itemView.findViewById(R.id.textTitulo)
         val descripcion: TextView = itemView.findViewById(R.id.textDescripcion)
         val imagen: ImageView = itemView.findViewById(R.id.ivImagenNota)
-        val botonEliminar: ImageView = itemView.findViewById(R.id.btnEliminarNota) // Botón de eliminar
-        val botonEditar: ImageView = itemView.findViewById(R.id.btnEditarNota) // Botón de editar
+        val botonEliminar: ImageView = itemView.findViewById(R.id.btnEliminarNota)
+        val botonEditar: ImageView = itemView.findViewById(R.id.btnEditarNota)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -32,19 +31,16 @@ class NotasAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val nota = listaNotas[position]
 
-        // Alternar colores de fondo
+
         val colores = listOf(R.color.light_blue, R.color.light_yellow, R.color.light_green)
         val colorFondo = colores[position % colores.size]
         holder.itemView.setBackgroundColor(holder.itemView.context.getColor(colorFondo))
 
-        // Asignar título
         holder.titulo.text = nota.titulo
 
-        // Buscar y asignar descripción
         val descripcionTexto = nota.elementos?.find { it["tipo"] == "texto" }?.get("contenido")
         holder.descripcion.text = descripcionTexto?.toString() ?: "Sin descripción"
 
-        // Asignar imagen opcional
         val imagenUrl = nota.elementos?.find { it["tipo"] == "imagen" }?.get("url")
         if (imagenUrl != null) {
             holder.imagen.visibility = View.VISIBLE
@@ -53,14 +49,13 @@ class NotasAdapter(
             holder.imagen.visibility = View.GONE
         }
 
-        // Configurar botón eliminar
         holder.botonEliminar.setOnClickListener {
-            onEliminarClick(nota.id) // Notificar a la actividad
+            onEliminarClick(nota.id)
         }
 
-        // Configurar botón editar
+
         holder.botonEditar.setOnClickListener {
-            onEditarClick(nota) // Envía el objeto Nota al callback
+            onEditarClick(nota)
         }
     }
 

@@ -7,12 +7,10 @@
     android:layout_height="match_parent"
     tools:context=".CrearNota">
 
-    <!-- Contenedor Principal -->
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <!-- Toolbar -->
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
@@ -24,15 +22,11 @@
             android:gravity="center_vertical"
             app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
 
-        <!-- Contenido Principal -->
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-            <!-- Título de la Nota -->
-
-            <!-- Contenedor de Notas -->
             <EditText
                 android:id="@+id/editTextTituloNota"
                 android:layout_width="0dp"
@@ -60,7 +54,6 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintBottom_toTopOf="@id/barraHerramientas" />
 
-            <!-- Barra de herramientas inferior -->
             <LinearLayout
                 android:id="@+id/barraHerramientas"
                 android:layout_width="0dp"
@@ -73,7 +66,6 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent">
 
-                <!-- Botones -->
                 <ImageButton
                     android:id="@+id/btnAgregarImagen"
                     android:layout_width="48dp"
@@ -109,7 +101,6 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
-    <!-- Menú lateral de navegación -->
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/navigationView"
         android:layout_width="wrap_content"

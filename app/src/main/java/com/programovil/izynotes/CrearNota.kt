@@ -2,6 +2,7 @@ package com.programovil.izynotes
 
 import android.Manifest
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
@@ -62,7 +63,6 @@ class CrearNota : AppCompatActivity() {
         val notaId = intent.getStringExtra("notaId")
         val tituloNota = intent.getStringExtra("titulo")
 
-        // Si recibimos una notaId, cargamos la nota existente
         if (notaId != null) {
             cargarNotaExistente(notaId, tituloNota)
         }
@@ -118,7 +118,6 @@ class CrearNota : AppCompatActivity() {
                         }
                         contenedorNota.addView(editText)
 
-                        // Ajustar la posición después de añadir la vista
                         editText.post {
                             editText.x = x
                             editText.y = y
@@ -133,7 +132,6 @@ class CrearNota : AppCompatActivity() {
                         }
                         contenedorNota.addView(imageView)
 
-                        // Ajustar la posición
                         imageView.post {
                             imageView.x = x
                             imageView.y = y
@@ -156,7 +154,6 @@ class CrearNota : AppCompatActivity() {
                         }
                         contenedorNota.addView(button)
 
-                        // Ajustar la posición
                         button.post {
                             button.x = x
                             button.y = y
@@ -230,14 +227,47 @@ class CrearNota : AppCompatActivity() {
     private fun setupMenu() {
         drawerLayout = findViewById(R.id.drawerLayout)
         val navigationView = findViewById<NavigationView>(R.id.navigationView)
+
         val toggle = ActionBarDrawerToggle(
             this, drawerLayout, findViewById(R.id.toolbar),
-            R.string.navigation_drawer_open, R.string.navigation_drawer_close
+            R.string.navigation_drawer_open,
+            R.string.navigation_drawer_close
         )
         drawerLayout.addDrawerListener(toggle)
         toggle.syncState()
 
-        navigationView.setNavigationItemSelectedListener {
+
+        navigationView.setNavigationItemSelectedListener { menuItem ->
+            when (menuItem.itemId) {
+                R.id.nav_perfil -> {
+                    Toast.makeText(this, "Ya estás en Perfil", Toast.LENGTH_SHORT).show()
+                }
+                R.id.nav_notas -> {
+                    val currentActivity = this::class.java.simpleName
+                    if (currentActivity != "Inicio") {
+                        val intent = Intent(this, Inicio::class.java)
+                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        startActivity(intent)
+                        finish()
+                    } else {
+                        Toast.makeText(this, "Ya estás en Inicio", Toast.LENGTH_SHORT).show()
+                    }
+                }
+                R.id.nav_archivo -> Toast.makeText(this, "Archivo seleccionado", Toast.LENGTH_SHORT).show()
+                R.id.nav_papelera -> Toast.makeText(this, "Papelera seleccionada", Toast.LENGTH_SHORT).show()
+                R.id.nav_ajustes -> Toast.makeText(this, "Ajustes seleccionados", Toast.LENGTH_SHORT).show()
+                R.id.nav_cerrarSesion -> {
+                    val prefs = getSharedPreferences(getString(R.string.prefs_file), Context.MODE_PRIVATE).edit()
+                    prefs.clear()
+                    prefs.apply()
+
+                    FirebaseAuth.getInstance().signOut()
+                    val intent = Intent(this, login::class.java)
+                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    startActivity(intent)
+                    finish()
+                }
+            }
             drawerLayout.closeDrawer(GravityCompat.START)
             true
         }
@@ -325,9 +355,9 @@ class CrearNota : AppCompatActivity() {
                 FrameLayout.LayoutParams.WRAP_CONTENT
             )
             hint = "Escribe aquí"
-            setHintTextColor(Color.BLACK) // Color negro para el hint
-            setTextColor(Color.BLACK)     // Color negro para el texto
-            setBackgroundColor(Color.TRANSPARENT) // Fondo transparente
+            setHintTextColor(Color.BLACK)
+            setTextColor(Color.BLACK)
+            setBackgroundColor(Color.TRANSPARENT)
             setOnTouchListener(MovableTouchListener(this))
         }
         contenedorNota.addView(editText)
@@ -344,27 +374,26 @@ class CrearNota : AppCompatActivity() {
         var totalSubidasPendientes = 0
         var subidasCompletadas = 0
 
-        // Función interna para verificar si todas las subidas finalizaron
         fun verificarSubidasCompletas() {
             if (subidasCompletadas == totalSubidasPendientes) {
-                subirNotaCompleta(titulo, elementos, usuario.uid) // Pasa el UID del usuario
+                subirNotaCompleta(titulo, elementos, usuario.uid)
             }
         }
 
         for (i in 0 until contenedorNota.childCount) {
             val view = contenedorNota.getChildAt(i)
             when (view) {
-                is EditText -> { // Guardar texto
+                is EditText -> {
                     val elemento = mapOf(
                         "tipo" to "texto",
                         "contenido" to view.text.toString(),
-                        "color" to "#000000", // Asume color por defecto
+                        "color" to "#000000",
                         "posicion" to mapOf("x" to view.x, "y" to view.y)
                     )
                     elementos.add(elemento)
                 }
 
-                is ImageView, is Button -> { // Subir imágenes y audios
+                is ImageView, is Button -> {
                     val uri = view.tag as? Uri
                     if (uri != null) {
                         totalSubidasPendientes++
@@ -384,7 +413,6 @@ class CrearNota : AppCompatActivity() {
             }
         }
 
-        // Si no hay archivos por subir, guardar la nota directamente
         if (totalSubidasPendientes == 0) {
             subirNotaCompleta(titulo, elementos, usuario.uid)
         }
@@ -406,9 +434,9 @@ class CrearNota : AppCompatActivity() {
     }
 
     private fun subirNotaCompleta(titulo: String, elementos: List<Map<String, Any>>, usuarioId: String) {
-        val nuevaNotaRef = databaseReference.child("notas").push() // Referencia con clave única
+        val nuevaNotaRef = databaseReference.child("notas").push()
         val nota = mapOf(
-            "id" to nuevaNotaRef.key, // Guardar la clave generada
+            "id" to nuevaNotaRef.key,
             "titulo" to titulo,
             "usuarioId" to usuarioId,
             "elementos" to elementos
@@ -417,6 +445,11 @@ class CrearNota : AppCompatActivity() {
         nuevaNotaRef.setValue(nota)
             .addOnSuccessListener {
                 Toast.makeText(this, "Nota guardada exitosamente", Toast.LENGTH_SHORT).show()
+
+                val intent = Intent(this, Inicio::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                startActivity(intent)
+                finish()
             }
             .addOnFailureListener {
                 Toast.makeText(this, "Error al guardar la nota", Toast.LENGTH_SHORT).show()
@@ -433,9 +466,9 @@ class CrearNota : AppCompatActivity() {
         private val longPressRunnable = Runnable {
             isLongPress = true
             if (view is EditText) {
-                mostrarMenuOpciones(view) // Muestra menú con opción de eliminar
+                mostrarMenuOpciones(view)
             } else {
-                mostrarBotonEliminar(view) // Muestra el botón para otros elementos
+                mostrarBotonEliminar(view)
             }
         }
 
@@ -531,7 +564,7 @@ class CrearNota : AppCompatActivity() {
         }
 
         private fun eliminarElemento(view: View) {
-            contenedorNota.removeView(view) // Elimina el elemento del contenedor
+            contenedorNota.removeView(view)
         }
     }
 

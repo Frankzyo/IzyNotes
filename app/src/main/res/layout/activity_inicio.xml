@@ -8,17 +8,14 @@
     android:layout_height="match_parent"
     tools:context=".Inicio">
 
-    <!-- Contenedor Principal -->
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <!-- Contenido Principal -->
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <!-- Toolbar -->
             <androidx.appcompat.widget.Toolbar
                 android:id="@+id/toolbar"
                 android:layout_width="0dp"
@@ -34,7 +31,6 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent" />
 
-            <!-- SearchView -->
             <androidx.appcompat.widget.SearchView
                 android:id="@+id/searchViewNotas"
                 android:layout_width="0dp"
@@ -46,8 +42,6 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent" />
 
-
-            <!-- RecyclerView para las notas -->
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerViewNotas"
                 android:layout_width="0dp"
@@ -59,7 +53,6 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintBottom_toTopOf="@id/fabAgregarNota" />
 
-            <!-- Botón Cerrar Sesión -->
             <Button
                 android:id="@+id/cerrarSesion"
                 android:layout_width="wrap_content"
@@ -69,7 +62,6 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent" />
 
-            <!-- FloatingActionButton -->
             <com.google.android.material.floatingactionbutton.FloatingActionButton
                 android:id="@+id/fabAgregarNota"
                 android:layout_width="wrap_content"
@@ -86,7 +78,6 @@
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
-    <!-- Menú Lateral -->
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/navigationView"
         android:layout_width="wrap_content"

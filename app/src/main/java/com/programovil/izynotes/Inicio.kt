@@ -28,7 +28,7 @@ class Inicio : AppCompatActivity() {
     private lateinit var searchViewNotas: SearchView
     private lateinit var notasAdapter: NotasAdapter
     private val listaNotas = mutableListOf<Nota>()
-    private val listaFiltrada = mutableListOf<Nota>() // Lista para el buscador
+    private val listaFiltrada = mutableListOf<Nota>()
     private lateinit var databaseReference: DatabaseReference
     private val userId = FirebaseAuth.getInstance().currentUser?.uid
 
@@ -47,7 +47,7 @@ class Inicio : AppCompatActivity() {
         setupCerrarSesion()
         setupFloatingActionButton()
         setupRecyclerView()
-        setupSearchView() // Configurar buscador
+        setupSearchView()
         cargarNotasDesdeFirebase()
     }
 
@@ -66,7 +66,17 @@ class Inicio : AppCompatActivity() {
         navigationView.setNavigationItemSelectedListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.nav_perfil -> startActivity(Intent(this, Perfil::class.java))
-                R.id.nav_notas -> Toast.makeText(this, "Notas seleccionadas", Toast.LENGTH_SHORT).show()
+                R.id.nav_notas -> {
+                    val currentActivity = this::class.java.simpleName
+                    if (currentActivity != "Inicio") {
+                        val intent = Intent(this, Inicio::class.java)
+                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        startActivity(intent)
+                        finish()
+                    } else {
+                        Toast.makeText(this, "Ya estás en Notas", Toast.LENGTH_SHORT).show()
+                    }
+                }
                 R.id.nav_archivo -> Toast.makeText(this, "Archivo seleccionado", Toast.LENGTH_SHORT).show()
                 R.id.nav_papelera -> Toast.makeText(this, "Papelera seleccionada", Toast.LENGTH_SHORT).show()
                 R.id.nav_ajustes -> Toast.makeText(this, "Ajustes seleccionados", Toast.LENGTH_SHORT).show()
@@ -86,6 +96,7 @@ class Inicio : AppCompatActivity() {
             true
         }
     }
+
 
     private fun setupCerrarSesion() {
         val botonCerrar: Button = findViewById(R.id.cerrarSesion)
@@ -115,7 +126,7 @@ class Inicio : AppCompatActivity() {
         recyclerViewNotas.layoutManager = GridLayoutManager(this, 2)
 
         notasAdapter = NotasAdapter(
-            listaFiltrada, // Usamos la lista filtrada para mostrar resultados
+            listaFiltrada,
             { notaId -> eliminarNotaDeFirebase(notaId) },
             { nota -> editarNota(nota) }
         )
@@ -125,20 +136,16 @@ class Inicio : AppCompatActivity() {
     private fun setupSearchView() {
         searchViewNotas = findViewById(R.id.searchViewNotas)
 
-        // Forzar que el SearchView muestre el campo de búsqueda y el ícono de lupa
         searchViewNotas.isIconified = false
-        searchViewNotas.setIconifiedByDefault(false) // No colapsar por defecto
+        searchViewNotas.setIconifiedByDefault(false)
 
-        // Modificar el color del texto dentro del SearchView
         val textView = searchViewNotas.findViewById(androidx.appcompat.R.id.search_src_text) as TextView
-        textView.setTextColor(android.graphics.Color.BLACK) // Color del texto
-        textView.setHintTextColor(android.graphics.Color.DKGRAY) // Color del hint
+        textView.setTextColor(android.graphics.Color.BLACK)
+        textView.setHintTextColor(android.graphics.Color.DKGRAY)
 
-        // Cambiar el ícono de la lupa si es necesario
         val searchIcon = searchViewNotas.findViewById<ImageView>(androidx.appcompat.R.id.search_mag_icon)
-        searchIcon.setImageResource(R.drawable.ic_search) // Reemplaza por tu ícono
+        searchIcon.setImageResource(R.drawable.ic_search)
 
-        // Configurar el listener para el buscador
         searchViewNotas.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 filtrarNotas(query)
@@ -155,7 +162,7 @@ class Inicio : AppCompatActivity() {
     private fun filtrarNotas(query: String?) {
         listaFiltrada.clear()
         if (query.isNullOrBlank()) {
-            listaFiltrada.addAll(listaNotas) // Mostrar todas las notas si no hay búsqueda
+            listaFiltrada.addAll(listaNotas)
         } else {
             listaNotas.filter { nota ->
                 nota.titulo.contains(query, ignoreCase = true)
@@ -205,7 +212,7 @@ class Inicio : AppCompatActivity() {
                             listaNotas.add(it)
                         }
                     }
-                    filtrarNotas("") // Inicializa la lista filtrada con todas las notas
+                    filtrarNotas("")
                 }
 
                 override fun onCancelled(error: DatabaseError) {
