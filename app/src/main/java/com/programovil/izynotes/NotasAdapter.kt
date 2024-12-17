@@ -30,6 +30,11 @@ class NotasAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val nota = listaNotas[position]
 
+        // Alternar colores de fondo
+        val colores = listOf(R.color.light_blue, R.color.light_yellow, R.color.light_green)
+        val colorFondo = colores[position % colores.size]
+        holder.itemView.setBackgroundColor(holder.itemView.context.getColor(colorFondo))
+
         // Asignar título
         holder.titulo.text = nota.titulo
 
@@ -51,6 +56,7 @@ class NotasAdapter(
             onEliminarClick(nota.id) // Notificar a la actividad
         }
     }
+
 
     override fun getItemCount(): Int = listaNotas.size
 }

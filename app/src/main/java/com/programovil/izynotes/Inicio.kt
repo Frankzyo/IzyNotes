@@ -135,28 +135,31 @@ class Inicio : AppCompatActivity() {
             Toast.makeText(this, "Usuario no autenticado", Toast.LENGTH_SHORT).show()
             return
         }
-        val userId = usuario.uid
+
+        val userId = usuario.uid // ID del usuario autenticado
         databaseReference = FirebaseDatabase.getInstance().getReference("notas")
 
-        databaseReference.addValueEventListener(object : ValueEventListener {
-            @SuppressLint("NotifyDataSetChanged")
-            override fun onDataChange(snapshot: DataSnapshot) {
-                listaNotas.clear()
-                for (notaSnapshot in snapshot.children) {
-                    val nota = notaSnapshot.getValue(Nota::class.java)
-                    nota?.let {
-                        it.id = notaSnapshot.key ?: "" // Asigna el ID de la nota desde Firebase
-                        listaNotas.add(it)
+        // Filtrar por usuarioId (correcto según la estructura)
+        databaseReference.orderByChild("usuarioId").equalTo(userId)
+            .addValueEventListener(object : ValueEventListener {
+                @SuppressLint("NotifyDataSetChanged")
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    listaNotas.clear()
+                    for (notaSnapshot in snapshot.children) {
+                        val nota = notaSnapshot.getValue(Nota::class.java)
+                        nota?.let {
+                            it.id = notaSnapshot.key ?: "" // Asigna el ID de la nota desde Firebase
+                            listaNotas.add(it)
+                        }
                     }
+                    notasAdapter.notifyDataSetChanged() // Actualiza el RecyclerView
                 }
-                notasAdapter.notifyDataSetChanged()
-            }
 
-            override fun onCancelled(error: DatabaseError) {
-                Toast.makeText(this@Inicio, "Error al cargar notas: ${error.message}", Toast.LENGTH_SHORT).show()
-                Log.e("Firebase", "Error: ${error.message}")
-            }
-        })
+                override fun onCancelled(error: DatabaseError) {
+                    Toast.makeText(this@Inicio, "Error al cargar notas: ${error.message}", Toast.LENGTH_SHORT).show()
+                    Log.e("Firebase", "Error: ${error.message}")
+                }
+            })
     }
 
 }
